@@ -1,0 +1,10 @@
+{"DeviceId": "Compressor1","TimeStamp": "10:33:10","EnergyConsumption": 0,"Pressure": 0}
+{"DeviceId": "Compressor1","TimeStamp": "10:33:11","EnergyConsumption": 2,"Pressure": 1}
+{"DeviceId": "Compressor1","TimeStamp": "10:33:12","EnergyConsumption": 4,"Pressure": 2}
+{"DeviceId": "Compressor1","TimeStamp": "10:33:13","EnergyConsumption": 8,"Pressure": 4}
+{"DeviceId": "Compressor1","TimeStamp": "10:33:14","EnergyConsumption": 8,"Pressure": 4}
+{"DeviceId": "Compressor1","TimeStamp": "10:33:15","EnergyConsumption": 8,"Pressure": 4}
+{"DeviceId": "Compressor1","TimeStamp": "10:33:16","EnergyConsumption": 8,"Pressure": 4}
+{"DeviceId": "Compressor1","TimeStamp": "10:33:17","EnergyConsumption": 0,"Pressure": 3}
+{"DeviceId": "Compressor1","TimeStamp": "10:33:18","EnergyConsumption": 0,"Pressure": 1}
+{"DeviceId": "Compressor1","TimeStamp": "10:33:19","EnergyConsumption": 0,"Pressure": 0}

@@ -1,0 +1,147 @@
+# Check if you are already logged in
+$loggedIn = az account show --query "name" -o tsv
+
+if ($loggedIn -ne $null) {
+    Write-Host "Already logged in as $loggedIn"
+} else {
+    Write-Host "Logging in..."
+    az login
+}
+
+
+# Retrieve default subscription id
+$subscriptionId = (
+    (
+        az account list -o json `
+            --query "[?isDefault]"
+    ) | ConvertFrom-Json
+).id
+
+# Set Subscription
+az account set --subscription $subscriptionId
+Write-Host "Subscription set to $subscriptionId"
+
+
+# Set random number
+$random = Get-Random -Minimum 100 -Maximum 999
+Write-Host "Unifier set to: $random"
+
+# Create Resource Group
+$resourceGroup = "FTA.AI.AnomalyDetection.2"
+$location = "francecentral"   # check if in this location supports the OpenAI Assistants API as well as GPT-4 vision
+
+az group create `
+    --location $location `
+    --resource-group $resourceGroup
+
+
+# Create OpenAI Cognitive Services
+$csOpenAIName = "OpenAI_$random"
+
+az cognitiveservices account create `
+    --name $csOpenAIName `
+    --resource-group $resourceGroup `
+    --location $location `
+    --kind OpenAI `
+    --sku S0 `
+    --yes
+
+$csOpenAIId = ( `
+    az cognitiveservices account show `
+        --name $csOpenAIName `
+        --resource-group $resourceGroup `
+        --query id `
+        --output tsv `
+)
+
+$csOpenAIEndpoint = ( `
+    az cognitiveservices account show `
+        --name $csOpenAIName `
+        --resource-group $resourceGroup `
+        --query properties.endpoint `
+        --output tsv `
+)
+
+$csOpenAIApiKey = (
+    az cognitiveservices account keys list `
+        --name $csOpenAIName `
+        --resource-group $resourceGroup `
+        --query key1 `
+        --output tsv `
+)
+
+# Text Embedding Model
+$modelFormat = "OpenAI"
+$modelEmbeddingDeploymentName = "textembeddingada002"
+$modelName = "text-embedding-ada-002"
+$modelVersion = "2"
+$scaleType = "Standard"
+
+az cognitiveservices account deployment create `
+   --resource-group $resourceGroup `
+   --name $csOpenAIName `
+   --deployment-name $modelEmbeddingDeploymentName `
+   --model-name $modelName `
+   --model-version $modelVersion `
+   --model-format $modelFormat `
+   --sku-name $scaleType `
+   --sku-capacity 1
+
+# GPT-4 Vision Model
+$modelFormat = "OpenAI"
+$modelVisionDeploymentName = "gpt4vision"
+$modelName = "gpt-4"
+$modelVersion = "vision-preview"
+$scaleType = "Standard"
+
+az cognitiveservices account deployment create `
+   --resource-group $resourceGroup `
+   --name $csOpenAIName `
+   --deployment-name $modelVisionDeploymentName `
+   --model-name $modelName `
+   --model-version $modelVersion `
+   --model-format $modelFormat `
+   --sku-name $scaleType `
+   --sku-capacity 1
+
+
+# GPT-4 1106
+$modelFormat = "OpenAI"
+$model1106DeploymentName = "gpt41106"
+$modelName = "gpt-4"
+$modelVersion = "1106-Preview"
+$scaleType = "Standard"
+
+az cognitiveservices account deployment create `
+   --resource-group $resourceGroup `
+   --name $csOpenAIName `
+   --deployment-name $modelVisionDeploymentName `
+   --model-name $modelName `
+   --model-version $model1106DeploymentName `
+   --model-format $modelFormat `
+   --sku-name $scaleType `
+   --sku-capacity 1
+
+# Store configuration 
+$configurationFile = "./Configuration/application.env"
+New-Item -Name $configurationFile -ItemType File
+
+
+function Set-ConfigurationFileVariable($configurationFile, $variableName, $variableValue) {
+    if (Select-String -Path $configurationFile -Pattern $variableName) {
+        (Get-Content $configurationFile) | Foreach-Object {
+            $_ -replace "$variableName = .*", "$variableName = $variableValue"
+        } | Set-Content $configurationFile
+    } else {
+        Add-Content -Path $configurationFile -value "$variableName = $variableValue"
+    }
+}
+
+Set-ConfigurationFileVariable $configurationFile "AOAI_APIKEY" $csOpenAIApiKey
+Set-ConfigurationFileVariable $configurationFile "AOAI_ENDPOINT" $csOpenAIEndpoint
+Set-ConfigurationFileVariable $configurationFile "EMBEDDING_DEPLOYMENTNAME" $modelEmbeddingDeploymentName
+Set-ConfigurationFileVariable $configurationFile "COMPLETION_DEPLOYMENTNAME" $modelVisionDeploymentName
+Set-ConfigurationFileVariable $configurationFile "COMPLETION_1106_DEPLOYMENTNAME_1106" $model1106DeploymentName
+
+Write-Host "Configuration file created at: $configurationFile"
+
