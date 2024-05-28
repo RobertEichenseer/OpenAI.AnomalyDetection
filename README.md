@@ -22,13 +22,13 @@ Each sample employs one file that captures the default behavior and another that
 
 ### Reference Data
 
-For this simplified sample, we are using [time series data](./TestData/TestData/TestData_Reference.txt) from a fictitious device called Compressor1, which records a time stamp, current pressure, and current energy consumption. Over the first three seconds, both energy consumption and the pressure produced by the device increase. This is followed by a period of four data points where both energy consumption and pressure remain stable. In the final three data points, energy consumption drops to zero, and the pressure gradually decreases. This pattern reflects the operational dynamics of Compressor1 over the observed time period.
+For this simplified sample, we are using [time series data](./TestData/TestData_Reference.txt) from a fictitious device called Compressor1, which records a time stamp, current pressure, and current energy consumption. Over the first three seconds, both energy consumption and the pressure produced by the device increase. This is followed by a period of four data points where both energy consumption and pressure remain stable. In the final three data points, energy consumption drops to zero, and the pressure gradually decreases. This pattern reflects the operational dynamics of Compressor1 over the observed time period.
 
 ![TimeSeriesTestData](./media/img/TestData_Reference.png)
 
 ### Anomaly Data
 
-A compressor that requires maintenance, such as cleaning of a filter, may consume the same amount of energy but fail to produce the same level of pressure. This is evident in the test data, where despite consistent energy consumption, the pressure fails to reach its highest level over four consecutive data points, indicating a drop in efficiency and the need for maintenance.
+A compressor that requires maintenance, such as cleaning of a filter, may consume the same amount of energy but fail to produce the same level of pressure. This is evident in the [test data](./TestData/TestData_Degradation.txt), where despite consistent energy consumption, the pressure fails to reach its highest level over four consecutive data points, indicating a drop in efficiency and the need for maintenance.
 
 ![TimeSeriesDegradation](./media/img/TestData_Degradation.png)
 
